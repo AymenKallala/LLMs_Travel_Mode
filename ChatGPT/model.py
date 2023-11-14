@@ -39,9 +39,9 @@ class OpenAI_Tweet_Analyzer():
         except:
             print("OpenAI API did not work")
         finally:
-            output = parse_gpt_output(answer)
+            return parse_gpt_output(answer)
 
-        return output
+
     
 def predict_dataset(analyzer,dataset):
     output_dict = defaultdict(defaultdict)
