@@ -25,7 +25,11 @@ class OpenAI_Tweet_Analyzer():
 
 
 
-        answer = '{"travel_mode":"API Problem","satisfaction":"API Problem","reason":"API Problem"}'
+        if self.prompt_technique == 'analogical':
+        
+            answer = """{"travel_mode":"API Problem","satisfaction":"API Problem","reason":"API Problem","example_1" :{"tweet":"API Problem","travel_mode_1":"API Problem","satisfaction_1":"API Problem","reason_1":"API Problem"},"example_2":{"tweet":"API Problem","travel_mode_2":"API Problem","satisfaction_2":"API Problem","reason_2":"API Problem"},"example_3":{"tweet":"API Problem","travel_mode_3":"API Problem","satisfaction_3":"API Problem","reason_3":"API Problem"}}}"""
+        else:
+            answer = '{"travel_mode":"API Problem","satisfaction":"API Problem","reason":"API Problem"}'
         
         try:
             completion = openai.ChatCompletion.create(model=self.model_name,
