@@ -8,9 +8,9 @@ Work done in Fall 2023 in collaboration with the DitecT Lab at Columbia. Leverag
 # LLMs
 
 I focused on 3 large language models to conduct my experiences:
-    - GPT3.5
-    - Mistral 7B
-    - LLama 13B
+1. GPT3.5
+2. Mistral 7B
+3. LLama 13B
 
 # Dataset
 
@@ -30,22 +30,23 @@ it to predict on a new input.
 ### My Prompt
 In my case the in-context learning prompt consisted in the following:
 ```
-Your goal is to retrieve the travel mode, the satisfaction (it has to be True or False) and the reason of the satisfaction, from a tweet.
+Your goal is to retrieve the travel mode, the satisfaction 
+(it has to be True or False) and the reason of the satisfaction,
+ from a tweet.
 
-
-            ### Examples:
-
-            Tweet : " Jesus, I've been waiting at this train station for an hour, they do not seem to be rushing to solve the left package issue... I hate NYC transit"
-            ["travel_mode" : "Train", "satisfaction" : "False", "reason": "left package"]
+### Examples:
+    Tweet : " Jesus, I've been waiting at this train station 
+    for an hour, they do not seem to berushing to solve the 
+    left package issue... I hate NYC transit"
+    ["travel_mode" : "Train", "satisfaction" : "False", "reason": "left package"]
                 
-            Tweet: "My computer died 3 hours ago"
-            ["travel_mode" : "N/A", "satisfaction" : "N/A", "reason": "N/A"]
+    Tweet: "My computer died 3 hours ago"
+     ["travel_mode" : "N/A", "satisfaction" : "N/A", "reason": "N/A"]
 
-            ### Now give me the output for this tweet :
-            {tweet}
+ ### Now give me the output for this tweet :
+    {tweet}
 
-
-            ONLY ANSWER WITH THE JSON OUTPUT FORMAT 
+ONLY ANSWER WITH THE JSON OUTPUT FORMAT 
 ```
 
 ## Chain of Thougts
@@ -56,28 +57,36 @@ Is a specific In-Context learning format: It consists in specifying a series of 
 ### My Prompt
 In my case the COT prompt consisted in the following:
 ```
-Your goal is to retrieve the travel mode, the satisfaction (it has to be True or False) and the reason of the satisfaction, from a tweet.
+Your goal is to retrieve the travel mode, the satisfaction 
+(it has to be True or False) and the reason of the satisfaction,
+ from a tweet.
 
+### Examples:
 
-            ### Examples:
-
-            Tweet : " Jesus, I've been waiting at this train station for an hour, they do not seem to be rushing to solve the left package issue... I hate NYC transit"
-               
-                In this tweet, the user mentionned the train, it is obviously the travel mode. They also mentionned a long waiting time with an injuction "Jesus" which refers to a non satisfaction and also gives the reason : long waiting time because of a left package issue.
-            
-                ["travel_mode" : "Train", "satisfaction" : "False", "reason": "left package"]
+    Tweet : " Jesus, I've been waiting at this train station for
+     an hour, they do not seem to berushing to solve the 
+     left package issue... I hate NYC transit"
                 
-            Tweet: "My computer died 3 hours ago"
-               
-                In this tweet, no mention of any travel mode is done. So we cannot determine any.
+    In this tweet, the user mentionned the train, it is obviously
+    the travel mode. They also mentionned a long waiting time with
+    an injuction "Jesus" which refers to a non satisfaction and 
+    also gives the reason : long waiting time because of a left
+     package issue.
+                
+    ["travel_mode" : "Train", "satisfaction" : "False", "reason": "left package"]
+                    
+    Tweet: "My computer died 3 hours ago"
+                
+    In this tweet, no mention of any travel mode is done.
+     So we cannot determine any.
 
-                ["travel_mode" : "N/A", "satisfaction" : "N/A", "reason": "N/A"]
+    ["travel_mode" : "N/A", "satisfaction" : "N/A", "reason": "N/A"]
 
-            ### Now give me the output for this tweet :
-            {tweet}
+### Now give me the output for this tweet :
+    {tweet}
 
 
-            ONLY ANSWER WITH THE JSON OUTPUT FORMAT 
+ONLY ANSWER WITH THE JSON OUTPUT FORMAT 
 ```
 
 ## Analogical Prompting
@@ -91,12 +100,19 @@ Below is an example of prompting.
 ### My Prompt
 In my case the COT prompt consisted in the following:
 ```
-Your goal is to retrieve the travel mode, the satisfaction (it has to be True or False) and the reason of the satisfaction, from a tweet.
+Your goal is to retrieve the travel mode, the satisfaction
+ (it has to be True or False) and the reason of the satisfaction,
+  from a tweet.
 
-                When presenting a given tweet, recall three relevant tweets as example. The relevant tweets should be distinct from each other and
-                from the initial one (e.g., involving different modes and reasons of satisfaction). For each example answer to the questions.Afterward, proceed to detect the travel mode in the initial tweet, the satisfaction regarding it and the reason.
+ When presenting a given tweet, recall three relevant tweets as example.
+ The relevant tweets should be distinct from each other and from the initial
+one (e.g., involving different modes and reasons of satisfaction). For each
+example answer to the questions.Afterward, proceed to detect the travel mode
+in the initial tweet, the satisfaction regarding it and the reason.
                
-                ONLY ANSWER WITH a JSON OUTPUT FORMAT. your answer has to get the following fields with the same structure. I wrote you a description of each one :
+ONLY ANSWER WITH a JSON OUTPUT FORMAT. your answer has to get the
+ following fields with the same structure. I wrote you
+  a description of each one :
                 
                ["example_1" : Recall a first example of tweet that is relevant to the initial tweet,
                ("tweet" : Write the first tweet example,
@@ -118,11 +134,13 @@ Your goal is to retrieve the travel mode, the satisfaction (it has to be True or
                "reason": This is the reason of the satisfaction for the initial tweet, you can be exhaustive here. Return 'N/A' if non applicable
                ]
                
-               ### Generate examples
-               For each of the example you recall, detect the travel mode, the satisfaction and the reason. You will incorporate them in the final output.
+### Generate examples
+For each of the example you recall, detect the travel mode,
+ the satisfaction and the reason. You will incorporate them
+  in the final output.
 
-                ### Now answer for this tweet :
-                {}
+### Now answer for this tweet :
+{tweet}
 ```
 
 
