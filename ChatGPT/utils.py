@@ -2,20 +2,26 @@ import json
 import pandas as pd
 import re
 
-def prompt(input,technique = 'in_context') :
+def prompt(input,travel_mode=None,reason=None,satisfaction=None,technique = 'in_context') :
     
     if technique == 'in_context':
   
-        return("""Your goal is to retrieve the travel mode, the satisfaction (it has to be True or False) and the reason of the satisfaction, from a tweet.
+        return("""Your goal is to retrieve the travel mode, the satisfaction (satisfied,dissatisfied or neutral) and the reason of the satisfaction, from a tweet.
 
 
             ### Examples:
 
             Tweet : " Jesus, I've been waiting at this train station for an hour, they do not seem to be rushing to solve the left package issue... I hate NYC transit"
-            ["travel_mode" : "Train", "satisfaction" : "False", "reason": "left package"]
+            ["travel_mode" : "train", "satisfaction" : "dissatisfied", "reason": "left package"]
                 
             Tweet: "My computer died 3 hours ago"
             ["travel_mode" : "N/A", "satisfaction" : "N/A", "reason": "N/A"]
+               
+            Tweet: "My Uber driver is so sweet, he let me plug my phone to the Bluetooth and play my own playlist"
+            ["travel_mode" : "uber", "satisfaction" : "satisfied", "reason": "The uber is sweet and let custom music playing"]
+               
+            Tweet: "I am currently seating in the back of the bus, there's an horrifc smell coming out the person next to me...."
+            ["travel_mode" : "bus", "satisfaction" : "dissatisfied", "reason": "horrific smell"]
 
             ### Now give me the output for this tweet :
             {}
@@ -24,7 +30,7 @@ def prompt(input,technique = 'in_context') :
             ONLY ANSWER WITH THE JSON OUTPUT FORMAT """.format(input))
     if technique == 'COT':
   
-        return("""Your goal is to retrieve the travel mode, the satisfaction (it has to be True or False) and the reason of the satisfaction, from a tweet.
+        return("""Your goal is to retrieve the travel mode, the satisfaction (satisfied,dissatisfied or neutral) and the reason of the satisfaction, from a tweet.
 
 
             ### Examples:
@@ -33,13 +39,25 @@ def prompt(input,technique = 'in_context') :
                
                 In this tweet, the user mentionned the train, it is obviously the travel mode. They also mentionned a long waiting time with an injuction "Jesus" which refers to a non satisfaction and also gives the reason : long waiting time because of a left package issue.
             
-                ["travel_mode" : "Train", "satisfaction" : "False", "reason": "left package"]
+                ["travel_mode" : "Train", "satisfaction" : "dissatisfied", "reason": "left package"]
                 
             Tweet: "My computer died 3 hours ago"
                
                 In this tweet, no mention of any travel mode is done. So we cannot determine any.
 
                 ["travel_mode" : "N/A", "satisfaction" : "N/A", "reason": "N/A"]
+               
+            Tweet: "My Uber driver is so sweet, he let me plug my phone to the Bluetooth and play my own playlist"
+               
+               In this tweet, the user mention specifically that they are in a uber and that the driver is sweet enough to let pick the music
+
+            ["travel_mode" : "uber", "satisfaction" : "satisfied", "reason": "The uber is sweet and let custom music playing"]
+               
+            Tweet: "I am currently seating in the back of the bus, there's an horrifc smell coming out the person next to me...."
+               
+               In this tweet, the bus is specifically mentioned. Besides, the term horrific smell let us know that the user is not satisfied and that it is the reason why.
+
+            ["travel_mode" : "bus", "satisfaction" : "dissatisfied", "reason": "horrific smell"]
 
             ### Now give me the output for this tweet :
             {}
@@ -48,7 +66,7 @@ def prompt(input,technique = 'in_context') :
             ONLY ANSWER WITH THE JSON OUTPUT FORMAT """.format(input))
     
     if technique == 'analogical':
-        return("""Your goal is to retrieve the travel mode, the satisfaction (it has to be True or False) and the reason of the satisfaction, from a tweet.
+        return("""Your goal is to retrieve the travel mode, the satisfaction (satisfied,dissatisfied or neutral) and the reason of the satisfaction, from a tweet.
 
                 When presenting a given tweet, recall three relevant tweets as example. The relevant tweets should be distinct from each other and
                 from the initial one (e.g., involving different modes and reasons of satisfaction). For each example answer to the questions.Afterward, proceed to detect the travel mode in the initial tweet, the satisfaction regarding it and the reason.
@@ -80,7 +98,31 @@ def prompt(input,technique = 'in_context') :
 
                 ### Now answer for this tweet :
                 {}
+     
                """.format(input))
+    if technique == 'self_verification':
+        return("""
+            Your goal is to perform answer verification. Based on this text:
+               {}
+
+               Someone has been asked the following questions:
+
+               "What is the travel mode mentioned in the text?"
+               The answer given was "{}"
+               It is possible that the text does not mention any travel mode, in which case the right answer would be 'Nan' or 'nan' or 'NaN'.
+
+               Does the user make reference of any satisfaction ?
+               The answer given was "{}"
+               It is possible that the text does not mention any satisfaction, in which case the right answer would be 'Nan' or 'nan' or 'NaN'.
+
+               If so, what is the reason ?
+               The answer given was "{}"
+               It is possible that the text does not mention any reason, in which case the right answer would be 'Nan' or 'nan' or 'NaN'.
+               
+               Are the answers correct ?
+               Answer only with True or False.
+
+        """.format(input,travel_mode,satisfaction,reason))
 
 def process_text(input):
     pattern = r"json"
@@ -92,45 +134,78 @@ def process_text(input):
     return regexed
 
 
-def parse_gpt_output(output):
+def parse_gpt_output(output,technique):
     string = process_text(output).strip()
-    try:
-        string = json.loads(string)
-    except :
-        print("An error occured with json formatting of the LLM output")
-    finally:
+    if technique == 'self_verification':
         return string
+    else:
+        try:
+            string = json.loads(string)
+        except :
+            print("An error occured with json formatting of the LLM output")
+        finally:
+            return string
+    
+def handle_error_apply(x,key1,key2):
+    try:
+        return x[key1][key2]
+    except:
+        return 'Error'
+
+def travel_mode(x):
+    try:
+        return x["travel_mode"]
+    except:
+        return 'Error'
+
+def satisfaction(x):
+    try:
+        return x["satisfaction"]
+    except:
+        return 'Error'
+    
+def reason(x):
+    try:
+        return x["reason"]
+    except:
+        return 'Error'
+
 
 def process_output(output_dict,technique = 'in_context'):
 
     if technique == 'in_context' or technique ==  'COT':
         output_df = pd.DataFrame.from_dict(output_dict,orient='index')
-        output_df["Travel Mode"] = output_df["output"].apply(lambda x: x["travel_mode"])
-        output_df["Satisfaction"] = output_df["output"].apply(lambda x: x["satisfaction"])
-        output_df["Reason"] = output_df["output"].apply(lambda x: x["reason"])
+        output_df["Travel Mode"] = output_df["output"].apply(lambda x: travel_mode(x))
+        output_df["Satisfaction"] = output_df["output"].apply(lambda x: satisfaction(x))
+        output_df["Reason"] = output_df["output"].apply(lambda x: reason(x))
 
         return output_df[["tweet","Travel Mode","Satisfaction","Reason"]]
     
     if technique == 'analogical':
         output_df = pd.DataFrame.from_dict(output_dict,orient='index')
 
-        output_df["Travel Mode"] = output_df["output"].apply(lambda x: x["travel_mode"])
-        output_df["Satisfaction"] = output_df["output"].apply(lambda x: x["satisfaction"])
-        output_df["Reason"] = output_df["output"].apply(lambda x: x["reason"])
-        output_df["Example 1"] = output_df["output"].apply(lambda x: x["example_1"]["tweet"])
-        output_df["Travel Mode 1"] = output_df["output"].apply(lambda x: x["example_1"]["travel_mode_1"])
-        output_df["Satisfaction 1"] = output_df["output"].apply(lambda x: x["example_1"]["satisfaction_1"])
-        output_df["Reason 1"] = output_df["output"].apply(lambda x: x["example_1"]["reason_1"])
-        output_df["Example 2"] = output_df["output"].apply(lambda x: x["example_2"]["tweet"])
-        output_df["Travel Mode 2"] = output_df["output"].apply(lambda x: x["example_2"]["travel_mode_2"])
-        output_df["Satisfaction 2"] = output_df["output"].apply(lambda x: x["example_2"]["satisfaction_2"])
-        output_df["Reason 2"] = output_df["output"].apply(lambda x: x["example_2"]["reason_2"])
-        output_df["Example 3"] = output_df["output"].apply(lambda x: x["example_3"]["tweet"])
-        output_df["Travel Mode 3"] = output_df["output"].apply(lambda x: x["example_3"]["travel_mode_3"])
-        output_df["Satisfaction 3"] = output_df["output"].apply(lambda x: x["example_3"]["satisfaction_3"])
-        output_df["Reason 3"] = output_df["output"].apply(lambda x: x["example_3"]["reason_3"])
+        output_df["Travel Mode"] = output_df["output"].apply(lambda x: travel_mode(x))
+        output_df["Satisfaction"] = output_df["output"].apply(lambda x: satisfaction(x))
+        output_df["Reason"] = output_df["output"].apply(lambda x: reason(x))
+        output_df["Example 1"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_1","tweet"))
+        output_df["Travel Mode 1"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_1","travel_mode_1"))
+        output_df["Satisfaction 1"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_1","satisfaction_1"))
+        output_df["Reason 1"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_1","reason_1"))
+        output_df["Example 2"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_2","tweet"))
+        output_df["Travel Mode 2"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_2","travel_mode_2"))
+        output_df["Satisfaction 2"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_2","satisfaction_2"))
+        output_df["Reason 2"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_2","reason_2"))
+        output_df["Example 3"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_3","tweet"))
+        output_df["Travel Mode 3"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_3","travel_mode_3"))
+        output_df["Satisfaction 3"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_3","satisfaction_3"))
+        output_df["Reason 3"] = output_df["output"].apply(lambda x: handle_error_apply(x,"example_3","reason_3"))
+        
 
         return output_df[['tweet','Travel Mode', 'Satisfaction', 'Reason', 'Example 1',
        'Travel Mode 1', 'Satisfaction 1', 'Reason 1', 'Example 2',
        'Travel Mode 2', 'Satisfaction 2', 'Reason 2', 'Example 3',
        'Travel Mode 3', 'Satisfaction 3', 'Reason 3']]
+    
+    if technique == "self_verification":
+        output_df = pd.DataFrame.from_dict(output_dict,orient='index',columns=['Correction'])
+        return output_df
