@@ -107,29 +107,75 @@ def prompt(
             input
         )
     if technique == "self_verification":
-        return """ In this tweet: {}
+        prompt = """I will give you a tweet and statements regarding it.
 
-            Your goal is to verify the following statements:
+                Your goal is to answer the following questions:
+                    Q1: Is STATEMENT 1 correct ? It is possible that the tweet does not mention any travel mode, in which case the right statement would be 'Nan' or 'nan' or 'NaN'.
+                    Q2: Is STATEMENT 2 correct ? It is possible that the text does not mention any satisfaction, in which case the right statement would be 'Nan' or 'nan' or 'NaN'.
+                    Q3: Is STATEMENT 3 correct ? It is possible that the text does not mention any reason, in which case the right statement would be 'Nan' or 'nan' or 'NaN'.
+                
+                
+                #Examples
 
-            STATEMENT 1: The travel mode detected in the tweet is "{}".
-            STATEMENT 2: The user's satisfaction towards the travel mode is "{}".
-            STATEMENT 3: The reason of satisfaction is "{}".
-            
-            Answer the following questions: 
-                Q1: Is STATEMENT 1 correct ? It is possible that the tweet does not mention any travel mode, in which case the right statement would be 'Nan' or 'nan' or 'NaN'.
-                Q2: Is STATEMENT 2 correct ? It is possible that the text does not mention any satisfaction, in which case the right statement would be 'Nan' or 'nan' or 'NaN'.
-                Q3: Is STATEMENT 3 correct ? It is possible that the text does not mention any reason, in which case the right statement would be 'Nan' or 'nan' or 'NaN'.
+                    ##Example 1:
+                        tweet: "remember when you could not get cell service in the subway... damn"
+                        STATEMENT 1: The travel mode detected in the tweet is "subway".
+                        STATEMENT 2: The user's satisfaction towards the travel mode is "dissatisfied".
+                        STATEMENT 3: The reason of satisfaction is "could not get cell service".
 
-            ONLY ANSWER WITH True or False.
-            ONLY ANSWER WITH a JSON OUTPUT FORMAT.your answer has to get the following fields with the same structure. I wrote you a description of each one :
-                [   "Travel_mode_verification" : Answer to Q1,
-                    "Satisfaction_verification" : Answer to Q2,
-                    "Reason_satisfaction": Answer to Q3,
-                ]
+                        Answer:
+                            ["Travel_mode_verification" : True,
+                            "Satisfaction_verification" : True,
+                            "Reason_verification": True,
+                            ]
 
-        """.format(
+                    ##Example 2:
+                        tweet: "can you tell the 96st station to move one of their train to the tracks beyond their stations, so this one can pull over"
+                        STATEMENT 1: The travel mode detected in the tweet is "train".
+                        STATEMENT 2: The user's satisfaction towards the travel mode is "neutral".
+                        STATEMENT 3: The reason of satisfaction is "request for train to move to clear tracks".
+
+                        Answer:
+                            ["Travel_mode_verification" : True,
+                            "Satisfaction_verification" : False,
+                            "Reason_verification": True,
+                            ]
+
+                    ##Example 3:
+                        tweet: "just noticed the mta (?) installed stee bollards next to the new elevator. more steel bollards please https: and and t.co and fycdzlvyl4"
+                        STATEMENT 1: The travel mode detected in the tweet is "mta".
+                        STATEMENT 2: The user's satisfaction towards the travel mode is "satisfied".
+                        STATEMENT 3: The reason of satisfaction is "installed steel bollards next to the new elevator".
+
+                        Answer:
+                            ["Travel_mode_verification" : False,
+                            "Satisfaction_verification" : True,
+                            "Reason_verification": True,
+                            ]
+
+
+
+                #Now answer for this tweet:
+                
+                    tweet:{}
+                    STATEMENT 1: The travel mode detected in the tweet is "{}".
+                    STATEMENT 2: The user's satisfaction towards the travel mode is "{}".
+                    STATEMENT 3: The reason of satisfaction is "{}".
+                    
+
+                    ONLY ANSWER WITH True or False.
+                    ONLY ANSWER WITH a JSON OUTPUT FORMAT.your answer has to get the following fields with the same structure. I wrote you a description of each one :
+                        ["Travel_mode_verification" : Answer to Q1,
+                        "Satisfaction_verification" : Answer to Q2,
+                        "Reason_verification": Answer to Q3,
+                        ]
+                    Be careful to use DOUBLE QUOTES to denote the keys.
+
+                """.format(
             input, travel_mode, satisfaction, reason
         )
+
+        return prompt
 
 
 def process_text(input):
@@ -146,8 +192,10 @@ def parse_gpt_output(output, technique):
     string = process_text(output).strip()
     try:
         string = json.loads(string)
+
     except:
         print("An error occured with json formatting of the LLM output")
+        print("String outputted by the model: ", string)
     finally:
         return string
 
@@ -176,22 +224,6 @@ def satisfaction(x):
 def reason(x):
     try:
         return x["reason"]
-    except:
-        return "Error"
-
-def tm_verification(x):
-    try:
-        return x["reason"]
-    except:
-        return "Error"
-def satisfaction_verification(x):
-    try:
-        return x["Satisfaction_verification"]
-    except:
-        return "Error"
-def reason_verification(x):
-    try:
-        return x["Reason_satisfaction"]
     except:
         return "Error"
 
@@ -270,11 +302,8 @@ def process_output(output_dict, technique="in_context"):
         ]
 
     if technique == "self_verification":
-        output_df = pd.DataFrame.from_dict(
-            output_dict, orient="index"
-        )
-        output_df["Travel_mode_verification"] = output_df["Travel_mode_verification"].apply(lambda x: tm_verification(x))
-        output_df["Satisfaction_verification"] = output_df["Satisfaction_verification"].apply(lambda x: satisfaction_verification(x))
-        output_df["Reason_verification"] = output_df["Reason_verification"].apply(lambda x: reason_verification(x))
-
-        return output_df[["Travel_mode_verification", "Satisfaction_verification", "Reason_verification"]]
+        try:
+            output_df = pd.DataFrame.from_dict(output_dict, orient="index")
+            return output_df
+        except:
+            return output_dict

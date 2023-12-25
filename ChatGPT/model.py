@@ -7,7 +7,6 @@ from openai import OpenAI
 from .utils import prompt, parse_gpt_output, process_output
 
 
-
 client = OpenAI(
     # This is the default and can be omitted
     api_key=os.environ["OPENAI_KEY"],
