@@ -1,11 +1,13 @@
-import pandas as pd
 import os
-from collections import defaultdict
-from tqdm import tqdm
 import time
-from openai import OpenAI
-from .utils import prompt, parse_gpt_output, process_output
+from collections import defaultdict
 
+import pandas as pd
+from openai import OpenAI
+from prompt import prompt
+from tqdm import tqdm
+
+from .utils import parse_gpt_output, process_output
 
 client = OpenAI(
     # This is the default and can be omitted
@@ -31,7 +33,7 @@ class OpenAI_Tweet_Analyzer:
 
         if self.prompt_technique == "analogical":
             answer = """{"travel_mode":"API Problem","satisfaction":"API Problem","reason":"API Problem","example_1" :{"tweet":"API Problem","travel_mode_1":"API Problem","satisfaction_1":"API Problem","reason_1":"API Problem"},"example_2":{"tweet":"API Problem","travel_mode_2":"API Problem","satisfaction_2":"API Problem","reason_2":"API Problem"},"example_3":{"tweet":"API Problem","travel_mode_3":"API Problem","satisfaction_3":"API Problem","reason_3":"API Problem"}}}"""
-        if self.prompt_technique == "COT" or "in_context":
+        if self.prompt_technique == "COT" or "in_context" or "zero_shot":
             answer = '{"travel_mode":"API Problem","satisfaction":"API Problem","reason":"API Problem"}'
         else:
             answer = '{"Travel_mode_verification":"API Problem","Satisfaction_verification":"API Problem","Reason_verification":"API Problem"}'
@@ -47,14 +49,14 @@ class OpenAI_Tweet_Analyzer:
         except:
             print("OpenAI API did not work")
         finally:
-            return parse_gpt_output(answer, self.prompt_technique)
+            return parse_gpt_output(answer)
 
 
 def predict_dataset(analyzer, dataset, sleep=False):
     output_dict = defaultdict(defaultdict)
 
-    for global_id in tqdm(dataset, total=len(dataset)):
-        tweet = dataset[global_id]["processed_txt"]
+    for global_id in tqdm(dataset.index, total=len(dataset)):
+        tweet = dataset["processed_txt"][global_id]
 
         answer = analyzer.predict(tweet)
         output_dict[global_id]["tweet"] = tweet

@@ -1,17 +1,65 @@
+import argparse
 
-from ChatGPT.model import OpenAI_Tweet_Analyzer,predict_dataset
-from data.load import load_data
-
-first_data = load_data(1000,1999)
-
-
-model = OpenAI_Tweet_Analyzer(model_name="gpt-3.5-turbo-1106",max_tokens = 300,temperature=0.7,prompt_technique="in_context")
-output_df_COT = predict_dataset(model,first_data,sleep=False)
-output_df_COT.to_excel('./results/1000_1999_in_context.xlsx')
+from ChatGPT.model import OpenAI_Tweet_Analyzer, predict_dataset
+from data.load import load
 
 
+def main(args):
+    dataset = load(args.data_path_1, args.data_path_2, start=args.start, end=args.end)
+    model = OpenAI_Tweet_Analyzer(
+        model_name="gpt-3.5-turbo-1106",
+        max_tokens=300,
+        temperature=0.7,
+        prompt_technique=args.technique,
+    )
+    output = predict_dataset(model, dataset, sleep=False)
+    if args.save:
+        output.to_excel(f"./results/{args.start}_{args.end}_{args.technique}.xlsx")
 
-model = OpenAI_Tweet_Analyzer(model_name="gpt-3.5-turbo-1106",max_tokens = 1000,temperature=0.7,prompt_technique="analogical")
-output_df_analogical = predict_dataset(model,first_data,sleep=False)
-output_df_analogical.to_excel('./results/1000_1999_Analog.xlsx')
 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "--start",
+        default=0,
+        type=int,
+        help="starting index in data file",
+    )
+    parser.add_argument(
+        "--end",
+        default=1000,
+        type=int,
+        help="starting index in data file",
+    )
+    parser.add_argument(
+        "--data_path_1",
+        default="../data/configs/fashionpedia.yaml",
+        type=str,
+        help="Path for the data file 1",
+    )
+    parser.add_argument(
+        "--data_path_2",
+        default="../data/configs/fashionpedia.yaml",
+        type=str,
+        help="Path for the data file 1",
+    )
+    parser.add_argument(
+        "--technique",
+        default="in_context",
+        type=str,
+        help="Prompt engineering technique",
+    )
+    parser.add_argument(
+        "--sleep", default=False, type=bool, help="Sleeping time during inference"
+    )
+    parser.add_argument(
+        "--save",
+        default=True,
+        type=bool,
+        help="Save output file",
+    )
+
+    args = parser.parse_args()
+
+    main(args)
