@@ -12,12 +12,12 @@ def load(file_path_1, file_path_2, start=None, end=None):
     return data
 
 
-def load_for_correction(file_path, start=0, end=2000):
+def load_for_correction(file_path, start=0, end=40):
     data = pd.read_csv(file_path)
-    dataset = data[["tweet", "Travel Mode", "Satisfaction", "Reason"]][start:end]
-    groundtruth = data[
+    dataset = data[["tweet", "Travel Mode", "Satisfaction", "Reason"]]
+    groundtruth = data[start:end][
         ["Travel Mode Correction Groundtruth", "Satisfaction Correction Groundtruth"]
-    ][start:end].rename(
+    ].rename(
         columns={
             "Travel Mode Correction Groundtruth": "Travel_mode_verification",
             "Satisfaction Correction Groundtruth": "Satisfaction_verification",

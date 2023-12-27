@@ -4,7 +4,7 @@ from collections import defaultdict
 
 import pandas as pd
 from openai import OpenAI
-from prompt import prompt
+from .prompt import prompt
 from tqdm import tqdm
 
 from .utils import parse_gpt_output, process_output
