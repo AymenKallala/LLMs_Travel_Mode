@@ -55,6 +55,16 @@ gpt_analysis.py --data_path_1 <FILE_PATH_1> --data_path_2 <FILE_PATH_2> --techni
  - `data_path_1` (and 2): The tweets file (csv containing a `GLOBAL_ID` and a `processed_txt` column.).
 - `technique`: the prompt engineering technique to use. Can be `zero_shot`, `in_context`, `COT` or `analogical`.
 
+## Correction
+To conduct a self-verification step, you need to be provided with a csv file of predicted data. You also need to correct by hand a few lines of this data file (needed to compute the trustworthiness of the correction). You will retain the number of line that you corrected yourself as the `<INT>` parameter below.
+```
+python main_verification.py --start 0 --end <INT> --data_path results/0_1999_In_Context_Learning.csv --sleep False
+
+```
+- `data_path` : The prediction file (csv containing a `tweet`, `travel_mode`, `satisfaction` and `reason` columns. The file also need to contain a `travel_mode_verification` and `satisfaction_verification` column (labeled by hand).).
+- `technique`: the prompt engineering technique to use. Can be `zero_shot`, `in_context`, `COT` or `analogical`.
+- `end` is the number of lines that you hand-labeled. Mandatory for the algorith to distinguish groundtruth corrections from predicted corrections and compute a `trust_rate`.
+
 | Yolo    | Total number of Params | Params in the Detect heads |
 | -------- | ------- | --------|
 | Nano| 3.1M|   800k  |
@@ -63,7 +73,7 @@ gpt_analysis.py --data_path_1 <FILE_PATH_1> --data_path_2 <FILE_PATH_2> --techni
 | Large| 43.6M|  5.6M |
 | XL| 59.4| 8.7M  |
 
-# Evaluate a Model
+# Challenge with models evaluation
 
 We are conducting information retrieval on *unlabeled data*. Therefore, no groundtruth labels are available. In order to evaluate our models, one solution is to perform *self-verification*. Strictly speaking, asking another LLM wether the answers provided along with the relevant tweet are correct or not. But how can we trust this _corrector_ ?
 
