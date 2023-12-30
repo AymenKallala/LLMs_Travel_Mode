@@ -9,6 +9,6 @@ def correcter_rate(pred, groundtruth):
     correct_pred = sum(
         pred["Travel_mode_verification"] == gt["Travel_mode_verification"]
     ) + sum(pred["Satisfaction_verification"] == gt["Satisfaction_verification"])
-    total = n* 2
+    total = n * 2
 
     return correct_pred / total

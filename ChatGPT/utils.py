@@ -8,7 +8,7 @@ def process_text(input):
     pattern = r"json"
     pattern_2 = r"```"
     pattern_3 = "\n"
-    pattern_4 = r'^jsonp\d+\(|\)\s+$'
+    pattern_4 = r"^jsonp\d+\(|\)\s+$"
     regexed = re.sub(pattern, "", input)
     regexed = re.sub(pattern_2, "", regexed)
     regexed = re.sub(pattern_3, "", regexed)
@@ -18,7 +18,7 @@ def process_text(input):
 
 def parse_gpt_output(output):
     string = process_text(output).strip()
-    #print("string outputted by the model: ", string)
+    # print("string outputted by the model: ", string)
     try:
         string = json.loads(string)
         # print("Correct string")
@@ -133,6 +133,6 @@ def process_output(output_dict, technique="in_context"):
     if technique == "self_verification":
         try:
             output_df = pd.DataFrame.from_dict(output_dict, orient="index")
-            return output_df.astype(bool)
+            return output_df  # .astype(bool)
         except:
             return output_dict

@@ -1,6 +1,3 @@
-
-
-
 def prompt(
     input, travel_mode=None, reason=None, satisfaction=None, technique="in_context"
 ):
@@ -135,7 +132,7 @@ def prompt(
                         STATEMENT 3: The reason of satisfaction is "could not get cell service".
 
                         Answer:
-                            {{"Travel_mode_verification" : "True","Satisfaction_verification" : "True","Reason_verification": "True"}}
+                            {{"Travel_mode_verification" : "Correct","Satisfaction_verification" : "Correct","Reason_verification": "Correct"}}
 
                     ##Example 2:
                         tweet: "can you tell the 96st station to move one of their train to the tracks beyond their stations, so this one can pull over"
@@ -144,7 +141,7 @@ def prompt(
                         STATEMENT 3: The reason of satisfaction is "request for train to move to clear tracks".
 
                         Answer:
-                            {{"Travel_mode_verification" : "True","Satisfaction_verification" : "False","Reason_verification": "True"}}
+                            {{"Travel_mode_verification" : "Correct","Satisfaction_verification" : "Not Correct","Reason_verification": "Correct"}}
 
                     ##Example 3:
                         tweet: "just noticed the mta (?) installed stee bollards next to the new elevator. more steel bollards please https: and and t.co and fycdzlvyl4"
@@ -153,17 +150,17 @@ def prompt(
                         STATEMENT 3: The reason of satisfaction is "installed steel bollards next to the new elevator".
 
                         Answer:
-                            {{"Travel_mode_verification" : "False","Satisfaction_verification" : "True","Reason_verification": "True"}}
+                            {{"Travel_mode_verification" : "Not Correct","Satisfaction_verification" : "Correct","Reason_verification": "Correct"}}
                     ##Example 4:
                         tweet: "too bad the mta has done nothing to increase service on 4th ave. we need to reconnect the city and it is transit. that is the only way we grow in a sane way."
                         STATEMENT 1: The travel mode detected in the tweet is "transit".
                         STATEMENT 2: The user's satisfaction towards the travel mode is "dissatisfied".
                         STATEMENT 3: The reason of satisfaction is "lack of increased service on 4th ave".
 
-                        'transit' is not a travel mode! Hence STATEMENT 1 is False.
+                        'transit' is not a travel mode! Hence STATEMENT 1 is Not Correct.
 
                         Answer:
-                            {{"Travel_mode_verification" : "False","Satisfaction_verification" : "True","Reason_verification": "True"}}
+                            {{"Travel_mode_verification" : "Not Correct","Satisfaction_verification" : "Correct","Reason_verification": "Correct"}}
 
 
 
@@ -175,7 +172,7 @@ def prompt(
                     STATEMENT 3: The reason of satisfaction is "{}".
                     
 
-                    ONLY ANSWER WITH True or False.
+                    ONLY ANSWER WITH "Correct" or "Not Correct".
                     ONLY ANSWER WITH a JSON OUTPUT FORMAT.your answer has to get the following fields with the same structure. I wrote you a description of each one :
                         {{"Travel_mode_verification" : "Answer to Q1","Satisfaction_verification" : "Answer to Q2","Reason_verification": "Answer to Q3"}}
                     Be careful to use DOUBLE QUOTES to denote the keys and values.
@@ -185,4 +182,3 @@ def prompt(
         )
 
         return prompt
-    
