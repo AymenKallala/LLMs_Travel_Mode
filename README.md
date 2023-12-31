@@ -64,7 +64,7 @@ This will save two output files, one csv and one excel. The csv will be useful t
 ## Verification
 To conduct a self-verification step, you need to be provided with the csv file of predicted data.
 ```
-python verification.py --start 0 --end <INT> --data_path results/0_1999_In_Context_Learning.csv --sleep False
+python verification.py --data_path results/0_1999_In_Context_Learning.csv --sleep False
 
 ```
 - `data_path` : The prediction file (csv containing a `tweet`, `travel_mode`, `satisfaction` and `reason` columns. The file also need to contain a `travel_mode_verification` and `satisfaction_verification` column (labeled by hand).).
