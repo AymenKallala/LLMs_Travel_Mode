@@ -19,6 +19,7 @@ def main(args):
 
     if args.save:
         output.to_excel(f"./results/Correction_{args.technique}.xlsx")
+        output.to_csv(f"./results/Correction_{args.technique}.csv")
 
 
 if __name__ == "__main__":

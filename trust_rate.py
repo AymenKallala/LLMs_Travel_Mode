@@ -20,7 +20,7 @@ def correcter_rate(pred, groundtruth):
 
 def main(args):
     correction, gt = load_for_trust_rate(
-        args.GT_PATH, args.CORRECTION_PATH, labeled_lines=args.labeled_lines
+        args.GT_PATH, args.VERIFIER_PATH, labeled_lines=args.labeled_lines
     )
     print(f" Trust rate: {correcter_rate(correction,gt)}")
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
         help="Path for the data file 1",
     )
     parser.add_argument(
-        "--CORRECTION_PATH",
+        "--VERIFIER_PATH",
         default="no_technique_specified",
         type=str,
         help="Path for the data file 1",

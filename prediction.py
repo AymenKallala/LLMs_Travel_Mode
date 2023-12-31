@@ -15,6 +15,7 @@ def main(args):
     output = predict_dataset(model, dataset, sleep=False)
     if args.save:
         output.to_excel(f"./results/{args.start}_{args.end}_{args.technique}.xlsx")
+        output.to_csv(f"./results/{args.start}_{args.end}_{args.technique}.csv")
 
 
 if __name__ == "__main__":

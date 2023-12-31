@@ -51,22 +51,33 @@ Below is an example of prompting.
 
 # Commands
 ## Prediction
+For prediction, you will need the 2 csv files where initial tweets are stored. It was (processed_0_999.csv) and (processed_1000_1999.csv) in my case.
 ```
-gpt_analysis.py --data_path_1 <FILE_PATH_1> --data_path_2 <FILE_PATH_2> --technique zero_shot
+python prediction.py --data_path_1 <FILE_PATH_1> --data_path_2 <FILE_PATH_2> --technique zero_shot
  
  ```
  - `data_path_1` (and 2): The tweets file (csv containing a `GLOBAL_ID` and a `processed_txt` column.).
 - `technique`: the prompt engineering technique to use. Can be `zero_shot`, `in_context`, `COT` or `analogical`.
 
-## Correction
-To conduct a self-verification step, you need to be provided with a csv file of predicted data. You also need to correct by hand a few lines of this data file (needed to compute the trustworthiness of the correction). You will retain the number of line that you corrected yourself as the `<INT>` parameter below.
+This will save two output files, one csv and one excel. The csv will be useful to compute the verification later on.
+
+## Verification
+To conduct a self-verification step, you need to be provided with the csv file of predicted data.
 ```
-python main_verification.py --start 0 --end <INT> --data_path results/0_1999_In_Context_Learning.csv --sleep False
+python verification.py --start 0 --end <INT> --data_path results/0_1999_In_Context_Learning.csv --sleep False
 
 ```
 - `data_path` : The prediction file (csv containing a `tweet`, `travel_mode`, `satisfaction` and `reason` columns. The file also need to contain a `travel_mode_verification` and `satisfaction_verification` column (labeled by hand).).
 - `technique`: the prompt engineering technique to use. Can be `zero_shot`, `in_context`, `COT` or `analogical`.
-- `end` is the number of lines that you hand-labeled. Mandatory for the algorith to distinguish groundtruth corrections from predicted corrections and compute a `trust_rate`.
+
+This will also output the verifications in two files, a csv and an excel one. The csv file will be needed to compute the trust rate.
+
+## Trust Rate
+To compute the trust rate of your verifications, you need to be provided with a csv file of verified data (computedi in last step). You also need to correct by hand a few lines of the initial predictions file (needed to compute the trustworthiness of the correction). You will retain the number of line that you corrected yourself as the `labeled_lines` parameter below.
+```
+python verification.py  --VERIFIER_PATH <verification_to_test> --GT_PATH <predictions verified by hand> --labeled_lines <INT>
+```
+- `labeled_lines` is the number of lines that you hand-labeled. Mandatory for the algorith to distinguish groundtruth corrections from predicted corrections and compute a `trust_rate`.
 
 | Yolo    | Total number of Params | Params in the Detect heads |
 | -------- | ------- | --------|
