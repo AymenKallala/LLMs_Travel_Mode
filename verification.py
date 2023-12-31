@@ -2,12 +2,12 @@ import argparse
 
 from ChatGPT.correction import correcter_rate
 from ChatGPT.model import OpenAI_Tweet_Analyzer, verify_dataset
-from data.load import load_for_correction
+from data.load import load_for_verification
 
 
 def main(args):
-    dataset, groundtruth = load_for_correction(
-        args.data_path, start=args.start, end=args.end
+    dataset = load_for_verification(
+        args.data_path,
     )
     model = OpenAI_Tweet_Analyzer(
         model_name="gpt-3.5-turbo-1106",
@@ -16,30 +16,14 @@ def main(args):
         prompt_technique="self_verification",
     )
     output = verify_dataset(model, dataset, sleep=False)
-    trust_rate = correcter_rate(output, groundtruth)
 
     if args.save:
         output.to_excel(f"./results/Correction_{args.technique}.xlsx")
-
-    print("-" * 59)
-    print(f"Correction trustworthiness: {trust_rate*100}%")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument(
-        "--start",
-        default=0,
-        type=int,
-        help="starting index in data file",
-    )
-    parser.add_argument(
-        "--end",
-        default=40,
-        type=int,
-        help="starting index in data file",
-    )
     parser.add_argument(
         "--data_path",
         default="../data/configs/fashionpedia.yaml",

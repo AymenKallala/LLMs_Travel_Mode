@@ -12,10 +12,15 @@ def load(file_path_1, file_path_2, start=None, end=None):
     return data
 
 
-def load_for_correction(file_path, start=0, end=40):
+def load_for_verification(file_path):
     data = pd.read_csv(file_path)
     dataset = data[["tweet", "Travel Mode", "Satisfaction", "Reason"]]
-    groundtruth = data[start:end][
+    return dataset
+
+
+def load_for_trust_rate(gt_file_path, correction_file_path, labeled_lines):
+    correction = pd.read_csv(correction_file_path)
+    groundtruth = pd.read_excel(gt_file_path)[:labeled_lines][
         ["Travel Mode Correction Groundtruth", "Satisfaction Correction Groundtruth"]
     ].rename(
         columns={
@@ -23,4 +28,5 @@ def load_for_correction(file_path, start=0, end=40):
             "Satisfaction Correction Groundtruth": "Satisfaction_verification",
         }
     )
-    return dataset, groundtruth
+
+    return correction, groundtruth

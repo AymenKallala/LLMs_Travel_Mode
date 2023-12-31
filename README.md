@@ -5,8 +5,11 @@ Work done in Fall 2023 in collaboration with the DitecT Lab at Columbia. Leverag
 # Motivation and Objective
 
 
-# Setup the environment
-
+# Setup the environment and your OpenAI key
+```
+pip install requirements.txt
+```
+To run succesfully the code, you will also need a valid OpenAI API token to save in the `OPENAI_KEY` variable environment.
 # LLMs
 
 I focused with one large language model to conduct my experience:
