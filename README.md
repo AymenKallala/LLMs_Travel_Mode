@@ -1,9 +1,9 @@
 # Large Language Models for Travel Mode Tweets Analysis
 
-Work done in Fall 2023 in collaboration with the DitecT Lab at Columbia. Leveraging prompt engineering techniques such as In-Context Learning, Chain-Of-Thoughts or Analogical Prompting Reasoning to conduct information retrieval on tweets and understand transportation change behaviours.
+This restitutes my work during the Fall 2023 semester in which our objective was to extract relevant information from unlabeled tweets. We focused on details such as travel mode, satisfaction, and reasons to analyze travel patterns. After exploring various prompting methods, including Plain In Context Learning, Chain of Thoughts, and Analogical Prompting, I found that the simplest prompts produced the most robust results when using the gpt3.5 turbo model for prediction.
 
-# Motivation and Objective
-
+ 
+Another challenge I encountered was assessing the results when using Large Language Models on unlabeled data. To address this, I used a "verifier" LLM to self-check the results predicted by my"labeler" LLM. After hand verifying a few predictions myself, I designed a trust rate to assess the reliability of my verifiers. However, my analysis revealed a low trust rate in almost every cases, indicating that further reflection is needed to ensure the reliability of the correction used to compute the performance of our labeler.
 
 # Setup the environment and your OpenAI key
 ```
