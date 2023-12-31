@@ -67,7 +67,7 @@ To conduct a self-verification step, you need to be provided with the csv file o
 python verification.py --data_path results/0_1999_In_Context_Learning.csv --sleep False
 
 ```
-- `data_path` : The prediction file (csv containing a `tweet`, `travel_mode`, `satisfaction` and `reason` columns. The file also need to contain a `travel_mode_verification` and `satisfaction_verification` column (labeled by hand).).
+- `data_path` : The prediction file (csv containing a `tweet`, `travel_mode`, `satisfaction` and `reason` columns.
 - `technique`: the prompt engineering technique to use. Can be `zero_shot`, `in_context`, `COT` or `analogical`.
 
 This will also output the verifications in two files, a csv and an excel one. The csv file will be needed to compute the trust rate.
@@ -79,13 +79,14 @@ python verification.py  --VERIFIER_PATH <verification_to_test> --GT_PATH <predic
 ```
 - `labeled_lines` is the number of lines that you hand-labeled. Mandatory for the algorith to distinguish groundtruth corrections from predicted corrections and compute a `trust_rate`.
 
-| Yolo    | Total number of Params | Params in the Detect heads |
-| -------- | ------- | --------|
-| Nano| 3.1M|   800k  |
-| Small| 11.1M| 2.14M|
-| Medium| 25.9M|  3.8M |
-| Large| 43.6M|  5.6M |
-| XL| 59.4| 8.7M  |
+# Results
+
+| Method    | Travel Mode | Satisfaction| Reason| Trust Rate |
+| -------- | ------- | --------|--------|--------|
+| Baseline (zero-shot)| 79%| 53% | 82%|  72% |
+| Plain In-Context Learning| 84%| 43%| 74%| 71% |
+| COT| 80%| 44% |  68%|  68% | 
+| Analogical Prompting| 77.5%|  41% | 54%|  66% |
 
 # Challenge with models evaluation
 
